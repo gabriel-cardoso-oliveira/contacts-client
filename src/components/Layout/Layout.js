@@ -17,6 +17,7 @@ import Sidebar from "../Sidebar";
 // pages
 import Contacts from "../../pages/contacts";
 import AddContacts from "../../pages/contacts/addContacts";
+import EditContacts from "../../pages/contacts/EditContacts";
 import Dashboard from "../../pages/dashboard";
 import Users from "../../pages/users";
 import AddUser from "../../pages/users/addUser";
@@ -50,6 +51,7 @@ function Layout(props) {
             <Switch>
               <Route path="/app/contacts" component={Contacts} />
               <Route path="/app/add-contacts" component={AddContacts} />
+              <Route path="/app/edit-contacts" component={EditContacts} />
               <Route path="/app/dashboard" component={Dashboard} />
               <Route path="/app/users" component={Users} />
               <Route path="/app/add-user" component={AddUser} />

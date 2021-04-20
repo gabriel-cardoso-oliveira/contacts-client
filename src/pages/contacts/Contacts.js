@@ -59,6 +59,15 @@ export default function Tables(props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const edtiContact = contactId => {
+    return props.history.push({
+      pathname: "/app/edit-contacts",
+      state: {
+        id: contactId,
+      },
+    });
+  };
+
   const options = {
     selectableRows: 'none',
     filterType: 'checkbox',
@@ -76,6 +85,7 @@ export default function Tables(props) {
               variant="contained"
               color="info"
               className={classnames(classes.buttonOptions)}
+              onClick={() => edtiContact(rowData[0])}
             >
               Editar
             </Button>

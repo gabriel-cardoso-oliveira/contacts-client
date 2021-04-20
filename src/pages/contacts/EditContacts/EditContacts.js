@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, TextField } from "@material-ui/core";
 import PropTypes from 'prop-types';
 import MaskedInput from 'react-text-mask';
@@ -69,6 +69,7 @@ export default function TypographyPage(props) {
   const [address, setAddress] = useState('');
 
   const schema = Yup.object().shape({
+    contactId: Yup.number().required(),
     name: Yup.string().required(),
     last_name: Yup.string().required(),
     fone: Yup.string().required(),
@@ -77,9 +78,10 @@ export default function TypographyPage(props) {
     email: Yup.string().email().required(),
   });
 
-  async function addContacts() {
+  async function editContact() {
     try {
       const values = {
+        contactId: Number(props.location.state.id),
         name,
         last_name: lastName,
         birth_date: birthDate.split('/').reverse().join('/'),
@@ -92,9 +94,9 @@ export default function TypographyPage(props) {
         return toast.error('É necessário preencher todos os campos.');
       }
 
-      await api.post('contacts', values);
+      await api.put('contacts', values);
 
-      toast.success('Contato adicionado com sucesso!');
+      toast.success('Contato alterado com sucesso!');
 
       return props.history.push("/app/contacts");
     } catch (error) {
@@ -104,16 +106,57 @@ export default function TypographyPage(props) {
     }
   }
 
+  function formatDate(birth_date) {
+    const date = new Date(birth_date);
+
+    const day =
+      date.getDate() >= 10
+        ? date.getDate()
+        : `0${date.getDate()}`;
+
+    const month =
+      date.getMonth() >= 10
+        ? date.getMonth() + 1
+        : `0${date.getMonth() + 1}`;
+
+    return `${day}/${month}/${date.getFullYear()}`;
+  }
+
+  async function getContact() {
+    const {
+      data,
+      status,
+    } = await api.get(`contacts/${props.location.state.id}`);
+
+    if (status !== 200) {
+      props.history.push('/app/contacts');
+
+      return toast.error('Contato não encontrado. Tente novamente!');
+    }
+
+    setName(data.name);
+    setLastName(data.last_name);
+    setBirthDate(formatDate(data.birth_date));
+    setEmail(data.email);
+    setFone(data.fone);
+    return setAddress(data.address);
+  }
+
+  useEffect(() => {
+    getContact();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
-      <PageTitle title="Adicionar Contato" button={
+      <PageTitle title="Editar Contato" button={
         <Button
           variant="contained"
           size="medium"
           color="secondary"
-          onClick={addContacts}
+          onClick={editContact}
         >
-          Adicionar
+          Salvar Alterações
         </Button>
       } />
 

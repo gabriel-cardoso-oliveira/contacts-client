@@ -1,0 +1,6 @@
+{
+  "name": "EditContacts",
+  "version": "0.0.0",
+  "main": "EditContacts.js",
+  "private": true
+}
