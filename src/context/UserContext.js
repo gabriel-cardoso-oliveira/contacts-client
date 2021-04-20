@@ -72,7 +72,7 @@ async function loginUser(dispatch, email, password, history, setIsLoading) {
       setIsLoading(false);
       dispatch({ type: 'LOGIN_SUCCESS' });
 
-      history.push('/app/dashboard');
+      history.push('/app/contacts');
     }, 1000);
   } catch (err) {
     dispatch({ type: "LOGIN_FAILURE" });
