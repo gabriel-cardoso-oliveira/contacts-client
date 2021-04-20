@@ -28,7 +28,6 @@ export default function Tables(props) {
       date.getDate() >= 10
         ? date.getDate()
         : `0${date.getDate()}`;
-    console.tron.log(day);
 
     const month =
       date.getMonth() >= 10
@@ -57,6 +56,7 @@ export default function Tables(props) {
 
   useEffect(() => {
     getContacts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const options = {

@@ -1,19 +1,11 @@
-import React, { useState, useEffect } from "react";
-import {
-  Grid,
-  TextField,
-  FormControl,
-  InputLabel,
-  Input,
-} from "@material-ui/core";
-import Visibility from '@material-ui/icons/Visibility';
-import VisibilityOff from '@material-ui/icons/VisibilityOff';
-import InputAdornment from '@material-ui/core/InputAdornment';
-import IconButton from '@material-ui/core/IconButton';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormLabel from '@material-ui/core/FormLabel';
+import React, { useState } from "react";
+import { Grid, TextField } from "@material-ui/core";
+import PropTypes from 'prop-types';
+import MaskedInput from 'react-text-mask';
+import Input from '@material-ui/core/Input';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 
 // styles
@@ -22,61 +14,104 @@ import useStyles from "./styles";
 // components
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import Widget from "../../../components/Widget/Widget";
-import { Typography } from "../../../components/Wrappers/Wrappers";
 import { Button } from "../../../components/Wrappers/Wrappers";
 
 import api from "../../../services/api";
 
-export default function TypographyPage() {
+function TextMaskDate(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={(ref) => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={[/[1-9]/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+TextMaskDate.propTypes = {
+  inputRef: PropTypes.func.isRequired,
+};
+
+function TextMaskFone(props) {
+  const { inputRef, ...other } = props;
+
+  return (
+    <MaskedInput
+      {...other}
+      ref={(ref) => {
+        inputRef(ref ? ref.inputElement : null);
+      }}
+      mask={['(', /[1-9]/, /\d/, ')', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
+
+TextMaskFone.propTypes = {
+  inputRef: PropTypes.func.isRequired,
+};
+
+export default function TypographyPage(props) {
   const classes = useStyles();
 
   const [name, setName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [administrator, setAdministrator] = useState('0');
-  const [values, setValues] = useState({
-    showPassword: false,
+  const [fone, setFone] = useState('');
+  const [address, setAddress] = useState('');
+
+  const schema = Yup.object().shape({
+    name: Yup.string().required(),
+    last_name: Yup.string().required(),
+    fone: Yup.string().required(),
+    birth_date: Yup.string().required(),
+    address: Yup.string().required(),
+    email: Yup.string().email().required(),
   });
-  const [permissions, setPermissions] = useState([]);
 
-  const handleClickShowPassword = () => {
-    setValues({ ...values, showPassword: !values.showPassword });
-  };
-
-  const handleMouseDownPassword = (event) => {
-    event.preventDefault();
-  };
-
-  const handleChangeAdministrator = (event) => {
-    setAdministrator(event.target.value);
-  };
-
-  const getPermissions = async () => {
+  async function addContacts() {
     try {
-      const { data } = await api.get('permissions');
+      const values = {
+        name,
+        last_name: lastName,
+        birth_date: birthDate.split('/').reverse().join('/'),
+        email,
+        fone,
+        address,
+      };
 
-      if (!data || !data.length) {
-        return toast.error('Ocorreu um erro inesperado. Saia e faça o Login novamente.');
+      if (!(await schema.isValid(values))) {
+        return toast.error('É necessário preencher todos os campos.');
       }
 
-      return setPermissions(data);
-    } catch (error) {
-      toast.error('Ocorreu um erro inesperado. Saia e faça o Login novamente.');
-    }
-  };
+      await api.post('contacts', values);
 
-  useEffect(() => {
-    getPermissions();
-  }, []);
+      toast.success('Contato adicionado com sucesso!');
+
+      return props.history.push("/app/contacts");
+    } catch (error) {
+      return toast.error(
+        'Ocorreu um erro inesperado. Verifique os dados e tente novamente!'
+      );
+    }
+  }
 
   return (
     <>
-      <PageTitle title="Adicionar Funcionário" button={
+      <PageTitle title="Adicionar Contato" button={
         <Button
           variant="contained"
           size="medium"
           color="secondary"
-          onClick={() => {}}
+          onClick={addContacts}
         >
           Adicionar
         </Button>
@@ -101,6 +136,45 @@ export default function TypographyPage() {
               type="text"
               fullWidth
             />
+            <TextField
+              id="last_name"
+              InputProps={{
+                classes: {
+                  underline: classes.textFieldUnderline,
+                  input: classes.textField,
+                },
+              }}
+              value={lastName}
+              onChange={e => setLastName(e.target.value)}
+              margin="normal"
+              placeholder="Sobrenome"
+              label="Sobrenome"
+              type="text"
+              fullWidth
+            />
+            <FormControl
+              className={{
+                classes: {
+                  underline: classes.textFieldUnderline,
+                  input: classes.textField,
+                },
+              }}
+              margin="normal"
+              fullWidth
+            >
+              <InputLabel htmlFor="birth_date">Data de Nascimento</InputLabel>
+              <Input
+                id="birth_date"
+                value={birthDate}
+                onChange={e => setBirthDate(e.target.value)}
+                name="textmask"
+                inputComponent={TextMaskDate}
+              />
+            </FormControl>
+          </Widget>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Widget title="Contatos" disableWidgetMenu>
             <TextField
               id="email"
               InputProps={{
@@ -127,73 +201,32 @@ export default function TypographyPage() {
               margin="normal"
               fullWidth
             >
-            <InputLabel htmlFor="password">Senha</InputLabel>
+              <InputLabel htmlFor="birth_date">Telefone</InputLabel>
               <Input
-                id="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="Senha"
-                type={values.showPassword ? 'text' : 'password'}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                    >
-                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
-                    </IconButton>
-                  </InputAdornment>
-                }
+                id="fone"
+                value={fone}
+                onChange={e => setFone(e.target.value)}
+                name="textmask"
+                inputComponent={TextMaskFone}
+                type="fone"
               />
             </FormControl>
-            <FormLabel component="legend" className={classes.labelRadio}>
-              Este funcionário é Administrador?
-            </FormLabel>
-            <RadioGroup
-              row
-              className={classes.radio}
-              aria-label="administrator"
-              name="administrator"
-              value={administrator}
-              onChange={handleChangeAdministrator}
-            >
-              <FormControlLabel value="1" control={<Radio />} label="Sim" />
-              <FormControlLabel value="0" control={<Radio />} label="Não" />
-            </RadioGroup>
-          </Widget>
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Widget title="Permissões" disableWidgetMenu>
-            <div className={classes.dashedBorder}>
-              <Typography variant="h1" color="primary" className={classes.text}>
-                h1. Heading
-              </Typography>
-              <Typography variant="h2" color="success" className={classes.text}>
-                h2. Heading
-              </Typography>
-              <Typography
-                variant="h3"
-                color="secondary"
-                className={classes.text}
-              >
-                h3. Heading
-              </Typography>
-              <Typography variant="h4" color="warning" className={classes.text}>
-                h4. Heading
-              </Typography>
-              <Typography
-                variant="h5"
-                color="primary"
-                colorBrightness="light"
-                className={classes.text}
-              >
-                h5. Heading
-              </Typography>
-              <Typography variant="h6" color="info">
-                h6. Heading
-              </Typography>
-            </div>
+            <TextField
+              id="address"
+              InputProps={{
+                classes: {
+                  underline: classes.textFieldUnderline,
+                  input: classes.textField,
+                },
+              }}
+              value={address}
+              onChange={e => setAddress(e.target.value)}
+              margin="normal"
+              placeholder="Endereço Completo"
+              label="Endereço Completo"
+              type="text"
+              fullWidth
+            />
           </Widget>
         </Grid>
       </Grid>
