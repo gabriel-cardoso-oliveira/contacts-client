@@ -35,7 +35,9 @@ function Login(props) {
         <div className={classes.containerImg}>
           <img src={logo} alt="logo" className={classes.logotypeImage} />
         </div>
-        <Typography className={classes.logotypeText}>Agenda de Contatos</Typography>
+        <Typography className={classes.logotypeText}>
+          Agenda de Contatos
+        </Typography>
       </div>
       <div className={classes.formContainer}>
         <div className={classes.form}>
@@ -103,13 +105,6 @@ function Login(props) {
                   Login
                 </Button>
               )}
-              <Button
-                color="primary"
-                size="large"
-                className={classes.forgetButton}
-              >
-                Esqueceu a senha?
-              </Button>
             </div>
           </React.Fragment>
         </div>

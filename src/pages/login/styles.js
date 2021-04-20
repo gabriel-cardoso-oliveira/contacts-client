@@ -140,10 +140,6 @@ export default makeStyles(theme => ({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  forgetButton: {
-    textTransform: "none",
-    fontWeight: 400,
-  },
   loginLoader: {
     marginLeft: theme.spacing(4),
   },
