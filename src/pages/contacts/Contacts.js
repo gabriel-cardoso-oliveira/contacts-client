@@ -21,18 +21,35 @@ export default function Tables(props) {
 
   const [contacts, setContacts] = useState([]);
 
+  function formatDate(birth_date) {
+    const date = new Date(birth_date);
+
+    const day =
+      date.getDate() >= 10
+        ? date.getDate()
+        : `0${date.getDate()}`;
+    console.tron.log(day);
+
+    const month =
+      date.getMonth() >= 10
+        ? date.getMonth() + 1
+        : `0${date.getMonth() + 1}`;
+
+    return `${day}/${month}/${date.getFullYear()}`;
+  }
+
   async function getContacts() {
     try {
       const { data } = await api.get('contacts');
 
-      // const contactsTmp = data.map(user => {
-      //   user.administrator = user.administrator ? 'Sim' : 'Não';
-      //   user.status = user.status ? 'Ativo' : 'Desativado';
+      const contactsTmp = data.map(contact => {
+        contact.birth_date = formatDate(contact.birth_date);
+        contact.name = `${contact.name} ${contact.last_name}`;
 
-      //   return user;
-      // });
+        return contact;
+      });
 
-      setContacts(data);
+      setContacts(contactsTmp);
     } catch (error) {
       toast.error('Ocorreu um erro inesperado. Saia e faça o Login novamente.');
     }
@@ -91,7 +108,7 @@ export default function Tables(props) {
 
   return (
     <>
-      <PageTitle title="Funcionários" button={
+      <PageTitle title="Contatos" button={
         <Button
           variant="contained"
           size="medium"
