@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Grid, TextField } from "@material-ui/core";
-import PropTypes from 'prop-types';
-import MaskedInput from 'react-text-mask';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
@@ -15,48 +13,10 @@ import useStyles from "./styles";
 import PageTitle from "../../../components/PageTitle/PageTitle";
 import Widget from "../../../components/Widget/Widget";
 import { Button } from "../../../components/Wrappers/Wrappers";
+import TextMaskDate from "../../../utils/textMaskDate";
+import TextMaskFone from "../../../utils/textMaskFone";
 
 import api from "../../../services/api";
-
-function TextMaskDate(props) {
-  const { inputRef, ...other } = props;
-
-  return (
-    <MaskedInput
-      {...other}
-      ref={(ref) => {
-        inputRef(ref ? ref.inputElement : null);
-      }}
-      mask={[/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-      placeholderChar={'\u2000'}
-      showMask
-    />
-  );
-}
-
-TextMaskDate.propTypes = {
-  inputRef: PropTypes.func.isRequired,
-};
-
-function TextMaskFone(props) {
-  const { inputRef, ...other } = props;
-
-  return (
-    <MaskedInput
-      {...other}
-      ref={(ref) => {
-        inputRef(ref ? ref.inputElement : null);
-      }}
-      mask={['(', /[1-9]/, /\d/, ')', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
-      placeholderChar={'\u2000'}
-      showMask
-    />
-  );
-}
-
-TextMaskFone.propTypes = {
-  inputRef: PropTypes.func.isRequired,
-};
 
 export default function TypographyPage(props) {
   const classes = useStyles();
