@@ -1,0 +1,6 @@
+{
+  "name": "AddContacts",
+  "version": "0.0.0",
+  "main": "AddContacts.js",
+  "private": true
+}
